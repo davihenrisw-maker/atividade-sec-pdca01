@@ -1,5 +1,174 @@
-Nome: Matheus Ferreira P. Marques
+Nome: DAVI HENRIQUE SALES
 Atividade01 - Segurança
 Dia: 26/08/2025
 
-Aqui eu coloco os relatos e validações as quais eu pedi no exercício.
+# atividade-sec-pdca01
+Atividade Aula Segurança 01 - Faculdade Serra Dourada Lorena
+
+Código a ser analisado em python!
+
+<pre>
+usuarios = {
+    "admin": "123456",  
+    "joao": "senha",
+    "maria": "1234"
+}
+
+def login(usuario, senha):
+    if usuario in usuarios and usuarios[usuario] == senha:
+        return f"Bem-vindo, {usuario}!"
+    else:
+        return "Usuário ou senha inválidos."
+
+if __name__ == "__main__":
+    print("=== Sistema de Login ===")
+    user = input("Usuário: ")
+    pwd = input("Senha: ")
+    print(login(user, pwd))
+</pre>
+
+
+# O que tem que ser feito
+Aplicação do PDCA
+
+🔹 Plan (Planejar)
+Identificar vulnerabilidades no código acima.
+Analisar riscos (Probabilidade x Impacto) de exploração.
+Vulnerabilidades
+
+Senhas armazenadas em texto puro (hardcoded)
+
+O dicionário usuarios guarda as senhas em texto simples dentro do código.
+
+Isso é perigoso porque:
+
+Se alguém acessar o código, terá acesso direto às senhas.
+
+Não há nenhuma forma de proteção (hash, criptografia).
+
+Usuários e senhas fixos dentro do código
+
+Boa prática: armazenar em banco de dados, arquivo seguro ou usar variáveis de ambiente.
+
+Nenhuma proteção contra ataques de força bruta
+
+O programa permite tentar infinitas vezes até acertar usuário/senha.
+
+Um invasor pode automatizar tentativas.
+
+Boa prática: limitar tentativas, implementar bloqueio temporário
+
+O código retorna sempre "Usuário ou senha inválidos".
+
+Aqui não há injeção SQL porque você não usa banco de dados
+
+Ausência de auditoria ou log
+
+Não há registro de quem tentou logar, nem das falhas.
+
+
+# Tabela de Riscos
+
+| ID | Risco                          | Probabilidade | Impacto  |
+|----|--------------------------------|---------------|----------|
+| 01 | Falha no servidor              | Alta          | Alto     | 
+| 02 | Erro humano em operação        | Média         | Médio    |
+| 03 | Atraso de fornecedor           | Alta          | Médio    |
+| 04 | Vazamento de dados             | Alto         | Alto     |
+| 05 | Ataque cibernético             | Média         | Alto     |
+
+
+🔹 Do (Executar)
+Corrigir código (citar quais são as correções feitas)
+
+import hashlib
+
+# Função para gerar hash da senha
+def gerar_hash(senha):
+    return hashlib.sha256(senha.encode()).hexdigest()
+
+# Usuários com senhas já em hash (não em texto puro)
+usuarios = {
+    "admin": gerar_hash("123456"),
+    "joao": gerar_hash("senha"),
+    "maria": gerar_hash("1234")
+}
+
+def login(usuario, senha):
+    senha_hash = gerar_hash(senha)
+    if usuario in usuarios and usuarios[usuario] == senha_hash:
+        return f"✅ Bem-vindo, {usuario}!"
+    else:
+        return "❌ Usuário ou senha inválidos."
+
+if __name__ == "__main__":
+    print("=== Sistema de Login Seguro ===")
+    tentativas = 0
+    while tentativas < 3:  # Limite de 3 tentativas
+        user = input("Usuário: ")
+        pwd = input("Senha: ")
+        resultado = login(user, pwd)
+        print(resultado)
+        if "Bem-vindo" in resultado:
+            break
+        tentativas += 1
+    if tentativas == 3:
+        print("🚨 Muitas tentativas falhas. Acesso bloqueado.")
+
+Diferenças principais:
+
+As senhas não ficam em texto puro → são convertidas em hash SHA-256.
+
+Adicionado limite de 3 tentativas → evita força bruta.
+
+Mantido bem simples para rodar direto no VS Code.
+
+## Subir versão corrigida para o GitHub respondendo abaixo os itens:
+
+Questionário para os alunos
+
+Quais vulnerabilidades você encontrou no código original?
+
+Senhas armazenadas em texto puro.
+
+Usuários e senhas fixos no código (hardcoded).
+
+Sem hash ou criptografia.
+
+Sem limite de tentativas (permite força bruta).
+
+Mensagem de erro pode ajudar em ataques (confirma existência de usuário).
+
+Sem logs ou auditoria de tentativas.
+
+Qual vulnerabilidade apresentou maior risco (P x I)?
+# Tabela de Riscos – Sistema de Login
+
+| Risco                        | Probabilidade (P) | Impacto (I) | Nível (P x I) | Mitigação |
+|-------------------------------|-----------------|------------|---------------|-----------|
+| Senhas expostas em texto puro | Média           | Alto       | Alto          | Usar hash seguro (SHA-256, bcrypt) |
+| Força bruta / múltiplas tentativas | Alta        | Médio      | Alto         | Limitar tentativas, bloqueio temporário |
+| Erro humano na criação de contas | Média        | Médio      | Moderado      | Validação de dados, auditoria |
+| Vazamento de dados do código  | Baixa           | Alto       | Moderado      | Armazenar senhas fora do código (BD seguro ou variáveis de ambiente) |
+| Mensagem de erro informativa  | Média           | Baixo      | Baixo         | Usar mensagens genéricas para usuário final |
+
+
+Qual seria o impacto real se essa falha fosse explorada em uma empresa?
+
+Invasão de dados da empresa, comprometendo a garantia das informações.
+
+Como você corrige as falhas encontradas?
+
+Criando um sistema de hash e limitando as tentativas de acesso.
+
+Após aplicar o PDCA, quais melhorias foram efetivas?
+respondidas na pergunta acima.
+
+## Vocês Alunos deverão fazer:
+Fork: O aluno faz um "fork" do seu repositório. Isso cria uma cópia completa do seu projeto na conta dele. O repositório original é chamado de "upstream" e a cópia do aluno é o "origin".
+
+Clone e Trabalho: O aluno clona a cópia dele (o "origin") para a máquina local e faz as alterações no código.
+
+Commit e Push: Após as alterações, o aluno faz um "commit" e envia (push) as mudanças para o repositório dele no GitHub.
+
+Pull Request: O aluno abre um Pull Request do repositório dele (o "origin") para o seu repositório original (o "upstream").
